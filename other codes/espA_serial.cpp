@@ -1,9 +1,4 @@
 #include <Arduino.h>
-//#include <BluetoothSerial.h> //remove for wired
-#include <ArduinoJson.h>
-
-/* ===================== BLUETOOTH ===================== */
-//BluetoothSerial SerialBT; //remove for wired
 
 /* ===================== MOTOR PINS ===================== */
 // Local ID 0: Gripper
@@ -18,19 +13,25 @@
 #define M2_DIR 22
 #define M2_PWM 23
 
+// Local ID 3: Linear Actuator
+#define M3_DIR 17
+#define M3_PWM 18
+
+
 struct MotorPin {
   int dir;
   int pwm;
 };
 
-MotorPin motorPins[3] = {
+MotorPin motorPins[4] = {
   {M0_DIR, M0_PWM},
   {M1_DIR, M1_PWM},
-  {M2_DIR, M2_PWM}
+  {M2_DIR, M2_PWM},
+  {M3_DIR, M3_PWM},
 };
 
 void setMotor(uint8_t id, bool fwd, uint8_t pwm) {
-  if (id > 2) return;
+  if (id > 3) return;
   digitalWrite(motorPins[id].dir, fwd ? HIGH : LOW);
   analogWrite(motorPins[id].pwm, pwm);
 }
@@ -38,9 +39,8 @@ void setMotor(uint8_t id, bool fwd, uint8_t pwm) {
 /* ===================== SETUP ===================== */
 void setup() {
   Serial.begin(115200);
-  //SerialBT.begin("ESP32A_ARM"); //remove for wired
 
-  for (int i = 0; i < 3; i++) {
+  for (int i = 0; i < 4; i++) {
     pinMode(motorPins[i].dir, OUTPUT);
     pinMode(motorPins[i].pwm, OUTPUT);
     digitalWrite(motorPins[i].dir, LOW);
@@ -53,19 +53,19 @@ void setup() {
 /* ===================== LOOP ===================== */
 void loop() {
 
- while (Serial.available()) { //change SerialBT to just Serial
-  uint8_t b = Serial.read(); //change SerialBT to just Serial
+ while (Serial.available()) {
+  uint8_t b = Serial.read();
 
   if (b != 0xAA) {
     continue; // not a sync byte, ignore
   }
 
   // Wait until full packet is available
-  while (Serial.available() < 3); //change SerialBT to just Serial
+  while (Serial.available() < 3);
 
-  uint8_t id  = Serial.read();//change SerialBT to just Serial
-  uint8_t dir = Serial.read();//change SerialBT to just Serial
-  uint8_t pwm = Serial.read();//change SerialBT to just Serial
+  uint8_t id  = Serial.read();
+  uint8_t dir = Serial.read();
+  uint8_t pwm = Serial.read();
 
   setMotor(id, dir, pwm);
 

@@ -1,9 +1,4 @@
-#include <Arduino.h>
-//#include <BluetoothSerial.h> //remove for wired
-
-/* ===================== BLUETOOTH ===================== */
-//BluetoothSerial SerialBT; //remove for wired
-
+#include "Arduino.h"
 /* ===================== MOTOR PINS ===================== */
 // Local ID 0: Elbow
 #define M0_DIR 27
@@ -37,8 +32,7 @@ void setMotor(uint8_t id, bool fwd, uint8_t pwm) {
 /* ===================== SETUP ===================== */
 void setup() {
   Serial.begin(115200);
-  //SerialBT.begin("ESP32B_ARM"); //change SerialBT to just Serial
-
+  
   for (int i = 0; i < 3; i++) {
     pinMode(motorPins[i].dir, OUTPUT);
     pinMode(motorPins[i].pwm, OUTPUT);
@@ -53,15 +47,15 @@ void setup() {
 void loop() {
 
   /* ---------- MOTOR RX ---------- */
-  while (Serial.available()) {   //change SerialBT to just Serial
-    uint8_t b = Serial.read();   //change SerialBT to just Serial
+  while (Serial.available()) {
+    uint8_t b = Serial.read();
     if (b != 0xAA) continue;
 
-    while (Serial.available() < 3);   //change SerialBT to just Serial
+    while (Serial.available() < 3);
 
-    uint8_t id  = Serial.read();  //change SerialBT to just Serial
-    uint8_t dir = Serial.read();  //change SerialBT to just Serial
-    uint8_t pwm = Serial.read();  //change SerialBT to just Serial
+    uint8_t id  = Serial.read();
+    uint8_t dir = Serial.read();
+    uint8_t pwm = Serial.read();
 
     setMotor(id, dir, pwm);
   }
